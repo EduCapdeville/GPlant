@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import { View, TextInput, Pressable, Text, Keyboard, ScrollView } from 'react-native';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
+import { useState } from "react";
+import { View , TextInput , Pressable , Text , Keyboard , ScrollView , Image } from "react-native";
+import { hortalicas } from "../../data/hortalicas_5"; // ajuste o caminho conforme necessário
 
 type Ficha = {
   nome: string;
@@ -14,12 +13,13 @@ type Ficha = {
   irrigacao: string;
   pragas: string;
   dicas: string;
+  imagem?: string;
 };
 
 export default function SearchScreen() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [resultado, setResultado] = useState<Ficha | null>(null);
-  const [erro, setErro] = useState('');
+  const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
 
   const buscar = async () => {
@@ -27,21 +27,19 @@ export default function SearchScreen() {
     if (!slug) return;
 
     Keyboard.dismiss();
-    setErro('');
+    setErro("");
     setResultado(null);
     setCarregando(true);
 
     try {
-      const ref = doc(db, 'hortalicas', slug);
-      const snap = await getDoc(ref);
-
-      if (snap.exists()) {
-        setResultado(snap.data() as Ficha);
+      const item = hortalicas.find((h) => h.slug === slug);
+      if (item) {
+        setResultado(item);
       } else {
-        setErro('Nenhuma hortaliça encontrada.');
+        setErro("Nenhuma hortaliça encontrada.");
       }
     } catch (e) {
-      setErro('Erro ao buscar dados.');
+      setErro("Erro ao buscar dados.");
     } finally {
       setCarregando(false);
     }
@@ -63,23 +61,61 @@ export default function SearchScreen() {
         onPress={buscar}
         className="bg-green-600 px-6 py-3 rounded-full shadow active:opacity-80 mb-6"
       >
-        <Text className="text-white text-base font-medium text-center">Pesquisar</Text>
+        <Text className="text-white text-base font-medium text-center">
+          Pesquisar
+        </Text>
       </Pressable>
 
-      {carregando && <Text className="text-center text-gray-500">Carregando...</Text>}
-      {erro !== '' && <Text className="text-center text-red-600">{erro}</Text>}
+      {carregando && (
+        <Text className="text-center text-gray-500">Carregando...</Text>
+      )}
+      {erro !== "" && <Text className="text-center text-red-600">{erro}</Text>}
 
       {resultado && (
-        <View className="bg-neutral-100 rounded-xl p-4 mt-4 space-y-2">
-          <Text className="text-xl font-bold text-green-800">{resultado.nome}</Text>
-          <Text className="text-sm text-gray-600 italic">{resultado.nome_cientifico}</Text>
-          <Text><Text className="font-semibold">Plantio:</Text> {resultado.plantio}</Text>
-          <Text><Text className="font-semibold">Solo:</Text> {resultado.solo}</Text>
-          <Text><Text className="font-semibold">Luz:</Text> {resultado.luz}</Text>
-          <Text><Text className="font-semibold">Ciclo:</Text> {resultado.ciclo}</Text>
-          <Text><Text className="font-semibold">Irrigação:</Text> {resultado.irrigacao}</Text>
-          <Text><Text className="font-semibold">Pragas:</Text> {resultado.pragas}</Text>
-          <Text><Text className="font-semibold">Dicas:</Text> {resultado.dicas}</Text>
+        <View className="bg-white rounded-2xl p-6 mt-4 shadow-md space-y-4">
+          {resultado.imagem && (
+            <Image
+              source={{ uri: resultado.imagem }}
+              style={{ width: "100%", height: 180, borderRadius: 12 }}
+              resizeMode="cover"
+            />
+          )}
+
+          <View className="items-center">
+            <Text className="text-2xl font-bold text-green-700">
+              {resultado.nome}
+            </Text>
+            <Text className="text-sm italic text-gray-500">
+              {resultado.nome_cientifico}
+            </Text>
+          </View>
+
+          <View className="space-y-1">
+            <Text>
+              <Text className="font-semibold">🌱 Plantio:</Text>{" "}
+              {resultado.plantio}
+            </Text>
+            <Text>
+              <Text className="font-semibold">🌾 Solo:</Text> {resultado.solo}
+            </Text>
+            <Text>
+              <Text className="font-semibold">☀️ Luz:</Text> {resultado.luz}
+            </Text>
+            <Text>
+              <Text className="font-semibold">⏳ Ciclo:</Text> {resultado.ciclo}
+            </Text>
+            <Text>
+              <Text className="font-semibold">💧 Irrigação:</Text>{" "}
+              {resultado.irrigacao}
+            </Text>
+            <Text>
+              <Text className="font-semibold">🐛 Pragas:</Text>{" "}
+              {resultado.pragas}
+            </Text>
+            <Text>
+              <Text className="font-semibold">💡 Dicas:</Text> {resultado.dicas}
+            </Text>
+          </View>
         </View>
       )}
     </ScrollView>
