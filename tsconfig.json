@@ -1,0 +1,20 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "baseUrl": ".",               // <- Isso é obrigatório
+    "paths": {
+      "@/*": ["app/*"],           // aponta para sua pasta 'app'
+      "@app-types/*": ["app-types/*"],    // permite usar @app-types/app
+      "@constants/*": ["constants/*"],
+      "@assets/*": ["assets/*"]
+    }
+  },
+
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+    "nativewind-env.d.ts"
+  ]
+}
